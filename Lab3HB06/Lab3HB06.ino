@@ -19,7 +19,7 @@ void setup() {
   xTaskCreate(Display_G_LED, "Grean LED Task", 128, NULL, 1, NULL);
   xTaskCreate(Display_Y_LED, "Yellow LED Task", 128, NULL, 1, NULL);
   xTaskCreate(Display_O_LED, "Orange LED Task", 128, NULL, 1, NULL);
-  vTaskStartSchedular();
+  vTaskStartScheduler();
 }
 
 void Display_R_LED(void *pvParameters) {   
@@ -36,7 +36,6 @@ void Display_R_LED(void *pvParameters) {
       }
       else
         vTaskDelay(pdMS_TO_TICKS(display_time));
-      display++;
     }
     else if(mode == 1)
     {
@@ -51,7 +50,7 @@ void Display_R_LED(void *pvParameters) {
     }
     else if(mode == 2)
     {
-      if(display != 0)
+      if(display > 0)
       {
         digitalWrite(R_LED, HIGH);
         vTaskDelay(pdMS_TO_TICKS(display_time));
@@ -60,6 +59,20 @@ void Display_R_LED(void *pvParameters) {
       else
         vTaskDelay(pdMS_TO_TICKS(display_time));
     } 
+    else if(mode == 3)
+    {
+      if(display == 4)
+      {
+        digitalWrite(R_LED, HIGH);
+        vTaskDelay(pdMS_TO_TICKS(display_time));
+        digitalWrite(R_LED, LOW);
+      }
+      else
+        vTaskDelay(pdMS_TO_TICKS(display_time));
+    } 
+    display++;
+    if(mode <= 1 && display >= 5) display = 0;
+    else if(mode > 1 && display >= 8) display = 0;
   } 
 }
  
@@ -102,7 +115,7 @@ void Display_G_LED(void *pvParameters) {
     } 
     else if(mode == 3)
     {
-      if(display >=3 && display <=6)
+      if(display >=3 && display <=5)
       {
         digitalWrite(G_LED, HIGH);
         vTaskDelay(pdMS_TO_TICKS(display_time));
@@ -220,7 +233,7 @@ void Read_Pot(void *pvParameters){
   while(1)
   {
     pot_val = analogRead(POT);
-    delay_time = map(pot_val, 0, 1023, 50, 1500);  
+    display_time = map(pot_val, 0, 1023, 50, 1500);  
   }
 }
 
@@ -243,8 +256,8 @@ void Read_Switch(void *pvParameters){
         if(mode>3)
           mode=0;
       }
-    }
-  }
+    } 
+  } 
 }
  
 void loop() { }
